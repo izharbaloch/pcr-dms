@@ -31,6 +31,24 @@
             <span class="truncate" :class="collapsed && 'lg:hidden'">{{ __('Dashboard') }}</span>
         </x-nav-link>
 
+        <p class="side-label" :class="collapsed && 'lg:invisible'">Fundraising</p>
+        <x-nav-link :href="route('donors.index')" :active="request()->routeIs('donors.*')" title="Donors">
+            <x-icon name="users" class="h-5 w-5 shrink-0" />
+            <span class="truncate" :class="collapsed && 'lg:hidden'">{{ __('Donors') }}</span>
+        </x-nav-link>
+        <x-nav-link :href="route('donations.index')" :active="request()->routeIs('donations.*')" title="Donations" class="mt-1">
+            <x-icon name="heart" class="h-5 w-5 shrink-0" />
+            <span class="truncate" :class="collapsed && 'lg:hidden'">{{ __('Donations') }}</span>
+        </x-nav-link>
+        <x-nav-link :href="route('sponsorships.index')" :active="request()->routeIs('sponsorships.*')" title="Sponsorships" class="mt-1">
+            <x-icon name="shield-check" class="h-5 w-5 shrink-0" />
+            <span class="truncate" :class="collapsed && 'lg:hidden'">{{ __('Sponsorships') }}</span>
+        </x-nav-link>
+        <x-nav-link :href="route('subscriptions.index')" :active="request()->routeIs('subscriptions.*')" title="Subscriptions" class="mt-1">
+            <x-icon name="refresh" class="h-5 w-5 shrink-0" />
+            <span class="truncate" :class="collapsed && 'lg:hidden'">{{ __('Subscriptions') }}</span>
+        </x-nav-link>
+
         <p class="side-label" :class="collapsed && 'lg:invisible'">Account</p>
         <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.*')" title="Profile">
             <x-icon name="user" class="h-5 w-5 shrink-0" />

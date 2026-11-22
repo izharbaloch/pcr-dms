@@ -8,6 +8,7 @@
         <title>{{ config('app.name', 'PCR DMS') }}</title>
 
         <!-- Scripts -->
+        @livewireStyles
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-slate-900">
@@ -50,5 +51,6 @@
                 </div>
             </main>
         </div>
+        @livewireScriptConfig
     </body>
 </html>

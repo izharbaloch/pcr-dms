@@ -8,15 +8,18 @@
         <title>{{ config('app.name', 'PCR DMS') }}</title>
 
         <!-- Scripts -->
+        @livewireStyles
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans">
         @php
-            // Breadcrumb label = the <h1> text of the page header.
-            $pageTitle = '';
-            if (isset($header) && preg_match('/<h1[^>]*>(.*?)<\/h1>/s', (string) $header, $titleMatch)) {
+            // Pages either pass a $header slot (Blade pages) or a $title / $subtitle / $breadcrumbs
+            // (Livewire pages). $breadcrumbs is a list of [label => url|null] pairs.
+            $pageTitle = $title ?? null;
+            if ($pageTitle === null && isset($header) && preg_match('/<h1[^>]*>(.*?)<\/h1>/s', (string) $header, $titleMatch)) {
                 $pageTitle = trim(strip_tags($titleMatch[1]));
             }
+            $crumbs = $breadcrumbs ?? ($pageTitle && ! request()->routeIs('dashboard') ? [$pageTitle => null] : []);
         @endphp
 
         <div x-data="{
@@ -105,11 +108,9 @@
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
 
-                                    <x-dropdown-link :href="route('logout')"
-                                            onclick="event.preventDefault();
-                                                        this.closest('form').submit();">
+                                    <button type="submit" class="menu-item">
                                         <x-icon name="logout" class="h-[18px] w-[18px] text-slate-400" /> {{ __('Log Out') }}
-                                    </x-dropdown-link>
+                                    </button>
                                 </form>
                             </x-slot>
                         </x-dropdown>
@@ -119,21 +120,33 @@
                 <!-- Page content -->
                 <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                     <div class="mx-auto w-full max-w-[90rem]">
-                        @isset($header)
+                        @if (isset($header) || isset($title))
                             <div class="mb-6">
                                 <!-- Breadcrumbs -->
-                                <nav class="mb-2 flex items-center gap-1.5 text-sm text-slate-500" aria-label="Breadcrumb">
+                                <nav class="mb-2 flex flex-wrap items-center gap-1.5 text-sm text-slate-500" aria-label="Breadcrumb">
                                     <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-1 transition hover:text-brand-700">
                                         <x-icon name="home" class="h-4 w-4" /> Home
                                     </a>
-                                    @if ($pageTitle !== '' && ! request()->routeIs('dashboard'))
+                                    @foreach ($crumbs as $label => $url)
                                         <x-icon name="chevron-right" class="h-3.5 w-3.5 text-slate-400" />
-                                        <span class="font-medium text-slate-700">{{ $pageTitle }}</span>
-                                    @endif
+                                        @if ($url)
+                                            <a href="{{ $url }}" class="transition hover:text-brand-700">{{ $label }}</a>
+                                        @else
+                                            <span class="font-medium text-slate-700">{{ $label }}</span>
+                                        @endif
+                                    @endforeach
                                 </nav>
-                                {{ $header }}
+
+                                @isset($title)
+                                    <h1 class="text-2xl font-bold tracking-tight text-slate-900">{{ $title }}</h1>
+                                    @isset($subtitle)
+                                        <p class="mt-1 text-sm text-slate-500">{{ $subtitle }}</p>
+                                    @endisset
+                                @else
+                                    {{ $header }}
+                                @endisset
                             </div>
-                        @endisset
+                        @endif
 
                         {{ $slot }}
                     </div>
@@ -144,5 +157,6 @@
                 </footer>
             </div>
         </div>
+        @livewireScriptConfig
     </body>
 </html>
