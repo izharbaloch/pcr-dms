@@ -54,8 +54,7 @@ class Index extends Component
 
     public function render(): View
     {
-        $subscriptions = Subscription::query()
-            ->select('id', 'reference', 'pakcr_donor', 'program', 'donation_type', 'amount', 'currency', 'donation_frequency', 'created_at', 'ends_at', 'stripe_status', 'isActive', 'isPaused', 'isCancelled')
+        $subscriptions = Subscription::withManualPlans()
             ->with('donor:id,auto,first_name,last_name,organization,email')
             ->search($this->search)
             ->withStatus($this->status)
@@ -68,7 +67,7 @@ class Index extends Component
         return view('livewire.subscriptions.index', ['subscriptions' => $subscriptions])
             ->layout('layouts::app', [
                 'title' => 'Subscriptions',
-                'subtitle' => 'Every recurring giving plan, with its donor, amount and status.',
+                'subtitle' => 'Every recurring giving plan, Stripe and manual, with its donor, amount and status.',
             ]);
     }
 

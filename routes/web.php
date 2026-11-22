@@ -17,9 +17,12 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/donors', Donors\Index::class)->name('donors.index');
+    Route::get('/donors/create', Donors\Create::class)->name('donors.create');
     Route::get('/donors/{donor}', Donors\Show::class)->whereNumber('donor')->name('donors.show');
     Route::get('/donations', Donations\Index::class)->name('donations.index');
+    Route::get('/donors/{donor}/donations/create', Donations\Create::class)->whereNumber('donor')->name('donations.create');
     Route::get('/sponsorships', Sponsorships\Index::class)->name('sponsorships.index');
+    Route::get('/donors/{donor}/sponsorships/create', Sponsorships\Create::class)->whereNumber('donor')->name('sponsorships.create');
     Route::get('/subscriptions', Subscriptions\Index::class)->name('subscriptions.index');
 });
 

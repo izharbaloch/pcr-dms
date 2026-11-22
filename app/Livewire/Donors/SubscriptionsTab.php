@@ -3,6 +3,7 @@
 namespace App\Livewire\Donors;
 
 use App\Models\Subscription;
+use App\Services\SponsorshipService;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -24,14 +25,16 @@ class SubscriptionsTab extends Component
 
     public function render(): View
     {
-        $subscriptions = Subscription::query()
-            ->select('id', 'reference', 'program', 'donation_type', 'amount', 'donation_frequency', 'currency', 'created_at', 'ends_at', 'stripe_status', 'isActive', 'isPaused', 'isCancelled')
+        $subscriptions = Subscription::withManualPlans()
             ->where('pakcr_donor', $this->donorKey)
             ->withStatus($this->scope)
             ->orderByDesc('created_at')
             ->orderByDesc('id')
             ->paginate(10);
 
-        return view('livewire.donors.subscriptions-tab', ['subscriptions' => $subscriptions]);
+        return view('livewire.donors.subscriptions-tab', [
+            'subscriptions' => $subscriptions,
+            'capacities' => app(SponsorshipService::class)->planCapacities($subscriptions->getCollection()),
+        ]);
     }
 }

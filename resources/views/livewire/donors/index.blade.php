@@ -3,6 +3,7 @@
     <div class="space-y-4 border-b border-slate-100 p-5 sm:p-6">
         <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
             <div class="flex-1"><x-list-search placeholder="Search by name, email or phone number…" /></div>
+            <a href="{{ route('donors.create') }}" wire:navigate class="btn-primary"><x-icon name="user" class="h-4 w-4" /> New donor</a>
 
             <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:flex lg:w-auto">
                 <select wire:model.live="type" class="select lg:w-40" aria-label="Donor type">

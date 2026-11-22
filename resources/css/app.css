@@ -75,6 +75,8 @@
     /* ---- Alerts ---- */
     .alert { @apply flex items-start gap-3 rounded-lg border px-4 py-3 text-sm; }
     .alert-success { @apply alert border-brand-200 bg-brand-50 text-brand-800; }
+    .alert-warning { @apply alert border-sun-200 bg-sun-50 text-sun-700; }
+    .alert-error { @apply alert border-red-200 bg-red-50 text-red-700; }
 
     /* ---- Tables ---- */
     .table-wrap { @apply overflow-x-auto; }

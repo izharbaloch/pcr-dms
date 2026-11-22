@@ -20,6 +20,18 @@ class Sponsorship extends Model
 
     protected $table = 'sponsorships';
 
+    protected $guarded = [];
+
+    /** Programs whose gifts can sponsor a child. */
+    public const PROGRAMS = ['Orphan Sponsorship', 'Orphan Care Program'];
+
+    /** What one child costs, in dollars: per month on a monthly plan, per year otherwise. */
+    public const MONTHLY_COST = 40;
+
+    public const YEARLY_COST = 480;
+
+    public const ACTIVE = 'active';
+
     protected string $frequencyColumn = 'frequency';
 
     protected string $dateColumn = 'sponsorship_date';
@@ -39,6 +51,23 @@ class Sponsorship extends Model
         'ended' => 'badge-gray',
         'cancelled' => 'badge-red',
     ];
+
+    /** Cost of sponsoring one child for a donation frequency, in cents. */
+    public static function unitCostCents(?string $frequency): int
+    {
+        return 100 * ($frequency === 'month' ? self::MONTHLY_COST : self::YEARLY_COST);
+    }
+
+    public static function isSponsorshipProgram(?string $program): bool
+    {
+        return in_array($program, self::PROGRAMS, true);
+    }
+
+    /** Sponsorships still drawing on the given plan or donation references. */
+    public function scopeDrawingOn(Builder $query, string|array $names): Builder
+    {
+        return $query->whereIn('subscription_name', (array) $names)->where('status', self::ACTIVE);
+    }
 
     public function donor(): BelongsTo
     {

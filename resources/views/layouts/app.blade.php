@@ -148,6 +148,12 @@
                             </div>
                         @endif
 
+                        @if (session('success'))
+                            <div class="alert-success mb-6" role="status">
+                                <x-icon name="check-circle" class="mt-0.5 h-5 w-5 shrink-0" /> {{ session('success') }}
+                            </div>
+                        @endif
+
                         {{ $slot }}
                     </div>
                 </main>

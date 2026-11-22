@@ -42,6 +42,34 @@ class Subscription extends Model
         'ended' => 'badge-gray',
     ];
 
+    /** Columns the combined listing of Stripe and manual plans shares. */
+    private const LISTING_COLUMNS = ['id', 'name', 'reference', 'pakcr_donor', 'program', 'donation_type', 'amount', 'currency', 'donation_frequency', 'created_at', 'ends_at'];
+
+    /**
+     * Every recurring plan, Stripe and manual, as one query with the same columns and status
+     * flags, so the usual scopes (search, status, frequency, dates) and sorting work on both.
+     * `source` says which table a row came from ("Stripe" or "Manual").
+     */
+    public static function withManualPlans(): Builder
+    {
+        $stripe = static::query()
+            ->select([...self::LISTING_COLUMNS, 'stripe_status', 'isActive', 'isPaused', 'isCancelled'])
+            ->selectRaw("'Stripe' AS source");
+
+        $manual = ManualSubscription::query()
+            ->select(self::LISTING_COLUMNS)
+            ->selectRaw('LOWER(plan_status) AS stripe_status')
+            ->selectRaw("(plan_status = 'active') AS isActive, 0 AS isPaused, (plan_status = 'Cancelled') AS isCancelled")
+            ->selectRaw("'Manual' AS source");
+
+        return static::query()->fromSub($stripe->unionAll($manual), 'subscriptions');
+    }
+
+    public function getIsManualAttribute(): bool
+    {
+        return ($this->attributes['source'] ?? null) === 'Manual';
+    }
+
     protected function casts(): array
     {
         return ['ends_at' => 'datetime'];

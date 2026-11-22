@@ -49,9 +49,14 @@
                         <p class="mt-0.5 text-sm text-slate-500">{{ $donor->organization }}</p>
                     @endif
                 </div>
-                <a href="{{ route('donors.index') }}" class="btn-secondary self-start sm:self-auto">
-                    <x-icon name="arrow-left" class="h-4 w-4" /> All donors
-                </a>
+                <div class="flex flex-wrap gap-2 self-start sm:self-auto">
+                    <a href="{{ route('donations.create', $donor) }}" wire:navigate class="btn-primary">
+                        <x-icon name="currency" class="h-4 w-4" /> New donation
+                    </a>
+                    <a href="{{ route('donors.index') }}" class="btn-secondary">
+                        <x-icon name="arrow-left" class="h-4 w-4" /> All donors
+                    </a>
+                </div>
             </div>
 
             <dl class="mt-6 grid gap-x-8 gap-y-4 text-sm sm:grid-cols-2 xl:grid-cols-4">

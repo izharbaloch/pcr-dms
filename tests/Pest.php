@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\DmsTestCase;
 use Tests\TestCase;
 
 /*
@@ -48,3 +49,6 @@ function something()
 {
     // ..
 }
+
+// Tests of the legacy donor tables run on their own MySQL test database (see DmsTestCase).
+pest()->extend(DmsTestCase::class)->in('Dms');

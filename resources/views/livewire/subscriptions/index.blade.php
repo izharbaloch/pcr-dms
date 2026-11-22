@@ -37,8 +37,8 @@
             </thead>
             <tbody>
                 @forelse ($subscriptions as $subscription)
-                    <tr wire:key="subscription-{{ $subscription->id }}">
-                        <td class="whitespace-nowrap font-mono text-xs text-slate-500">{{ $subscription->reference ?: '#'.$subscription->id }}</td>
+                    <tr wire:key="subscription-{{ $subscription->source }}-{{ $subscription->id }}">
+                        <td class="whitespace-nowrap font-mono text-xs text-slate-500">{{ $subscription->reference ?: '#'.$subscription->id }} @if ($subscription->is_manual)<span class="badge-blue ml-1 !font-sans">Manual</span>@endif</td>
                         <td><x-donor-cell :donor="$subscription->donor" /></td>
                         <td class="hidden lg:table-cell">
                             {{ $subscription->program ?: '—' }}

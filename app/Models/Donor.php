@@ -21,6 +21,8 @@ class Donor extends Model
 
     protected $primaryKey = 'auto';
 
+    protected $guarded = [];
+
     protected function casts(): array
     {
         return [
@@ -58,6 +60,11 @@ class Donor extends Model
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class, 'pakcr_donor', 'auto');
+    }
+
+    public function manualSubscriptions(): HasMany
+    {
+        return $this->hasMany(ManualSubscription::class, 'pakcr_donor', 'auto');
     }
 
     public function sponsorships(): HasMany
@@ -148,7 +155,8 @@ class Donor extends Model
     }
 
     /**
-     * Adds total, active, cancelled and ended subscription counts.
+     * Adds total, active, cancelled and ended subscription counts, Stripe and manual plans together:
+     * the two are counted separately and the *_subscriptions_count accessors add them up.
      */
     public function scopeWithSubscriptionCounts(Builder $query): Builder
     {
@@ -157,7 +165,37 @@ class Donor extends Model
             'subscriptions as active_subscriptions_count' => fn (Builder $q) => $q->active(),
             'subscriptions as cancelled_subscriptions_count' => fn (Builder $q) => $q->cancelled(),
             'subscriptions as ended_subscriptions_count' => fn (Builder $q) => $q->ended(),
+            'manualSubscriptions',
+            'manualSubscriptions as active_manual_count' => fn (Builder $q) => $q->active(),
+            'manualSubscriptions as cancelled_manual_count' => fn (Builder $q) => $q->cancelled(),
+            'manualSubscriptions as ended_manual_count' => fn (Builder $q) => $q->ended(),
         ]);
+    }
+
+    protected function subscriptionsCount(): Attribute
+    {
+        return $this->withManualCount('manual_subscriptions_count');
+    }
+
+    protected function activeSubscriptionsCount(): Attribute
+    {
+        return $this->withManualCount('active_manual_count');
+    }
+
+    protected function cancelledSubscriptionsCount(): Attribute
+    {
+        return $this->withManualCount('cancelled_manual_count');
+    }
+
+    protected function endedSubscriptionsCount(): Attribute
+    {
+        return $this->withManualCount('ended_manual_count');
+    }
+
+    /** The Stripe count already on the model plus the manual one. */
+    private function withManualCount(string $manualColumn): Attribute
+    {
+        return Attribute::get(fn ($stripe) => (int) $stripe + (int) ($this->attributes[$manualColumn] ?? 0));
     }
 
     /**
